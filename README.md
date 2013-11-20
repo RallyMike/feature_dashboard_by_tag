@@ -2,7 +2,7 @@ feature_dashboard_by_tag
 =========================
 
 ## Overview
-
+Report against all Features which have been tagged with the selected tag.
 
 ## License
 
