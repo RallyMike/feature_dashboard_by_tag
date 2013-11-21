@@ -13,6 +13,15 @@
 
     launch: function() {
         //Write app code here
+
+        Ext.create('Ext.Container', {
+            items: [{
+                xtype: 'rallytagpicker',
+                autoExpand: true
+            }],
+            renderTo: Ext.getBody().dom
+        });
+
     }
 });
 
