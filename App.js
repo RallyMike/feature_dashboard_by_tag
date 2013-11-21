@@ -24,7 +24,10 @@ Ext.define('CustomApp', {
 
     // --- App global variables ---
 
+    gSkipTagPicker: true,       // Use hard-coded tag or select from picker
     gTagName: undefined,        // Tag name selected
+
+    gFeatureObjectIDArr: [],    // Array of the object ID's of the features selected
 
     // --- end global variables ---
 
@@ -33,30 +36,39 @@ Ext.define('CustomApp', {
         //Write app code here
         console.log("App in Running!!!")
 
-        // grab app header container
-        var aContainer = this.down('#appHeaderContainer');
+
+        if (this.gSkipTagPicker === false)
+        {
+            // grab app header container
+            var aContainer = this.down('#appHeaderContainer');
 
 
-        aTagPicker = Ext.create('Rally.ui.picker.MultiObjectPicker', {
-            modelType: 'tag',
-            //autoExpand: true, // NOTE: this config is all jacked up
-            fieldLabel: "Pick your Tag Yo",
-            listeners:{
-                select:function (theTagPicker, theSelectedValue) {
-                    this.gTagName = theSelectedValue.get('Name');
+            aTagPicker = Ext.create('Rally.ui.picker.MultiObjectPicker', {
+                modelType: 'tag',
+                //autoExpand: true, // NOTE: this config is all jacked up
+                fieldLabel: "Pick your Tag Yo",
+                listeners:{
+                    select:function (theTagPicker, theSelectedValue) {
+                        this.gTagName = theSelectedValue.get('Name');
 
-                    console.log("this.gTagName: " + this.gTagName);
+                        console.log("this.gTagName: " + this.gTagName);
 
-                    this._selectTaggedFeatures();
-                },
-                scope:this
-            }
+                        this._selectTaggedFeatures();
+                    },
+                    scope:this
+                }
 
-        });
+            });
 
-        aContainer.add(aTagPicker);
+            aContainer.add(aTagPicker);
 
+        }
 
+        else // hard-code it!
+        {
+            this.gTagName = "Customer B";
+            this._selectTaggedFeatures();
+        }
 
     }, // end launch()
 
@@ -123,27 +135,38 @@ Ext.define('CustomApp', {
         console.log("nbrFeatures: " + nbrFeatures + "\n");
 
         // loop through each feature
-        for (var ndx = 0; ndx < nbrFeatures; ndx++) {
+        var that = this;
 
-            aFeature = theTaggedFeatures[ndx];
+        Ext.each(theTaggedFeatures, function(aFeature){
 
             if (aFeature != null) {
 
+                var aFeatureObjectID = aFeature.get("ObjectID");
                 var aFeatureName = aFeature.get("Name");
-                console.log("aFeatureName: " + aFeatureName);
-
                 var aProjectName = aFeature.get("Project")["Name"];
-                console.log("aProjectName: " + aProjectName + "\n");
 
-                // capture the Project name
-                aFeature["ProjectName"] = aProjectName;
+                console.log("aFeatureObjectID: " + aFeatureObjectID);
+                console.log("aFeatureName: " + aFeatureName);
+                console.log("aProjectName: " + aProjectName);
+                //debugger;
 
-                var testName = aFeature.get("ProjectName");
-                console.log("testName: " + testName);
+                // retain the Project name directly in the record
+                aFeature.set("ProjectName", aProjectName);
+                console.log('aFeature.get("ProjectName"): ' + aFeature.get("ProjectName") + "\n");
+
+                var anObjectID = new Object(aFeatureObjectID);
+                console.log("anObjectID: " + anObjectID);
+
+                var len = that.gFeatureObjectIDArr.length;
+                console.log("len: " + len);
+
+
+                that.gFeatureObjectIDArr.push(anObjectID);
+                console.log(that.gFeatureObjectIDArr);
 
             } // end test if valid feature
 
-        } // end loop through each feature
+        }); // end loop through each feature
 
 
         // throw the tagged features into a grid
@@ -171,22 +194,12 @@ Ext.define('CustomApp', {
             store: featureStore,
 
             columnCfgs: [
-                {
-                    text: 'ObjectID',
-                    dataIndex: 'ObjectID'
-                },
-                {
-                    text: 'Name',
-                    dataIndex: 'Name'
-                },
-                {
-                    text: 'ProjectName',
-                    dataIndex: 'ProjectName'
-                },
-                {
-                    text: 'FormattedID',
-                    dataIndex: 'FormattedID'
-                }
+                {text: 'ObjectID',              dataIndex: 'ObjectID',                      flex: 1},
+                {text: 'FormattedID',           dataIndex: 'FormattedID',                   flex: 1},
+                {text: 'Name',                  dataIndex: 'Name',                          flex: 2},
+                {text: 'Project',               dataIndex: 'ProjectName',                   flex: 1},
+                {text: 'Leaf Stories (Count)',  dataIndex: 'LeafStoryCount',                flex: 1},
+                {text: 'Leaf Stories (Size)',   dataIndex: 'LeafStoryPlanEstimateTotal',    flex: 3}
             ]//,
             //height:400
         });
