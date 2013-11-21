@@ -111,7 +111,7 @@ Ext.define('CustomApp', {
 
                     console.log("Loading freaking data baby");
 
-                    this._processTaggedFeatures(records);
+                    this._tableOfContents(records);
 
                 },
                 scope:this
@@ -122,6 +122,22 @@ Ext.define('CustomApp', {
         console.log("E ==> _selectTaggedFeatures()" + "\n");
 
     }, // end _selectTaggedFeatures()
+
+    _tableOfContents: function(theTaggedFeatures) {
+
+        console.log("B ==> _tableOfContents()" + "\n");
+
+
+        // ----- Primary function used to drive the rest of the App -----
+
+        this._processTaggedFeatures(theTaggedFeatures); // process the tagged features
+
+        this._gridTaggedFeatures(theTaggedFeatures); // throw the tagged features into a grid
+
+
+        console.log("E ==> _tableOfContents()" + "\n");
+
+    }, // end _tableOfContents()
 
     _processTaggedFeatures: function(theTaggedFeatures) {
 
@@ -167,10 +183,6 @@ Ext.define('CustomApp', {
             } // end test if valid feature
 
         }); // end loop through each feature
-
-
-        // throw the tagged features into a grid
-        this._gridTaggedFeatures(theTaggedFeatures);
 
 
         console.log("E ==> _processTaggedFeatures()" + "\n");
